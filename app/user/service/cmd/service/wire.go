@@ -6,11 +6,11 @@
 package main
 
 import (
-	"social-network\service/internal/biz"
-	"social-network\service/internal/conf"
-	"social-network\service/internal/data"
-	"social-network\service/internal/server"
-	"social-network\service/internal/service"
+	"social-network/app/user/service/internal/biz"
+	"social-network/app/user/service/internal/conf"
+	"social-network/app/user/service/internal/data"
+	"social-network/app/user/service/internal/server"
+	"social-network/app/user/service/internal/service"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"

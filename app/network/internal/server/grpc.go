@@ -1,9 +1,8 @@
 package server
 
 import (
-	v1 "social-network\network/api/helloworld/v1"
-	"social-network\network/internal/conf"
-	"social-network\network/internal/service"
+	"social-network/app/network/internal/conf"
+	"social-network/app/network/internal/service"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"

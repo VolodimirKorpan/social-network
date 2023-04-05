@@ -1,7 +1,6 @@
 package server
 
 import (
-	v1 "social-network\network/api/helloworld/v1"
 	"social-network\network/internal/conf"
 	"social-network\network/internal/service"
 
