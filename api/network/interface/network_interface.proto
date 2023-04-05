@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package api.network.interface;
+
+option go_package = "social-network/api/network/interface;interface";
+option java_multiple_files = true;
+option java_package = "api.network.interface";
+
+service NetworkInterface {
+	rpc CreateNetworkInterface (CreateNetworkInterfaceRequest) returns (CreateNetworkInterfaceReply);
+	rpc UpdateNetworkInterface (UpdateNetworkInterfaceRequest) returns (UpdateNetworkInterfaceReply);
+	rpc DeleteNetworkInterface (DeleteNetworkInterfaceRequest) returns (DeleteNetworkInterfaceReply);
+	rpc GetNetworkInterface (GetNetworkInterfaceRequest) returns (GetNetworkInterfaceReply);
+	rpc ListNetworkInterface (ListNetworkInterfaceRequest) returns (ListNetworkInterfaceReply);
+}
+
+message CreateNetworkInterfaceRequest {}
+message CreateNetworkInterfaceReply {}
+
+message UpdateNetworkInterfaceRequest {}
+message UpdateNetworkInterfaceReply {}
+
+message DeleteNetworkInterfaceRequest {}
+message DeleteNetworkInterfaceReply {}
+
+message GetNetworkInterfaceRequest {}
+message GetNetworkInterfaceReply {}
+
+message ListNetworkInterfaceRequest {}
+message ListNetworkInterfaceReply {}
