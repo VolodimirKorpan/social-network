@@ -15,7 +15,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *v1.CreateUserReq) (*v
 		return nil, err
 	}
 	return &v1.CreateUserReply{
-		Id: rv.ID,
+		Id:       rv.ID,
 		Username: rv.Username,
 	}, nil
 }
@@ -25,8 +25,9 @@ func (s *UserService) GetUser(ctx context.Context, req *v1.GetUserReq) (*v1.GetU
 	if err != nil {
 		return nil, err
 	}
+
 	return &v1.GetUserReply{
-		Id: rv.ID,
+		Id:       rv.ID,
 		Username: rv.Username,
 	}, nil
 }

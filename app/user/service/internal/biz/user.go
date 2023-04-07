@@ -31,27 +31,18 @@ func NewUserUseCase(repo UserRepo, logger log.Logger) *UserUseCase {
 	return &UserUseCase{repo: repo, log: log.NewHelper(log.With(logger, "module", "usecase/user"))}
 }
 
-func (uc *UserUseCase) Create(ctx context.Context, u *User) (*User, error) {
-	out, err := uc.repo.CreateUser(ctx, u)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (uc *UserUseCase) Save(ctx context.Context, in *v1.SaveUserReq) (*v1.SaveUserReq, error) {
+func (uc *UserUseCase) Save(ctx context.Context, in *v1.SaveUserReq) (*v1.SaveUserReply, error) {
 	user := &User{
 		ID:       rand.Int63(),
 		Username: in.Username,
 		Password: in.Password,
 	}
-
 	_, err := uc.repo.CreateUser(ctx, user)
 	if err != nil {
+		// todo: handle error
 		return nil, err
 	}
-
-	return &v1.SaveUserReq{
+	return &v1.SaveUserReply{
 		Id: user.ID,
 	}, nil
 }
@@ -59,12 +50,21 @@ func (uc *UserUseCase) Save(ctx context.Context, in *v1.SaveUserReq) (*v1.SaveUs
 func (uc *UserUseCase) GetUserByUsername(ctx context.Context, in *v1.GetUserByUsernameReq) (*v1.GetUserByUsernameReply, error) {
 	user, err := uc.repo.FindByUsername(ctx, in.Username)
 	if err != nil {
+		//todo: handle error
 		return nil, err
 	}
 	return &v1.GetUserByUsernameReply{
 		Id:       user.ID,
 		Username: user.Username,
 	}, nil
+}
+
+func (uc *UserUseCase) Create(ctx context.Context, u *User) (*User, error) {
+	out, err := uc.repo.CreateUser(ctx, u)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (uc *UserUseCase) Get(ctx context.Context, id int64) (*User, error) {
