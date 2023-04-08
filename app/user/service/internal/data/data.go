@@ -8,10 +8,13 @@ import (
 	"github.com/google/wire"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	// init mysql driver
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewGormClient)
+var ProviderSet = wire.NewSet(NewGormClient, NewData, NewUserRepo)
 
 // Data .
 type Data struct {

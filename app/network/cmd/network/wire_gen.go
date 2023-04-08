@@ -7,30 +7,37 @@
 package main
 
 import (
-	"social-network\network/internal/biz"
-	"social-network\network/internal/conf"
-	"social-network\network/internal/data"
-	"social-network\network/internal/server"
-	"social-network\network/internal/service"
-
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
+	"social-network/app/network/internal/biz"
+	"social-network/app/network/internal/conf"
+	"social-network/app/network/internal/data"
+	"social-network/app/network/internal/server"
+	"social-network/app/network/internal/service"
+)
+
+import (
+	_ "go.uber.org/automaxprocs"
 )
 
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*kratos.App, func(), error) {
-	dataData, cleanup, err := data.NewData(confData, logger)
+func wireApp(confServer *conf.Server, registry *conf.Registry, confData *conf.Data, auth *conf.Auth, logger log.Logger) (*kratos.App, func(), error) {
+	discovery := data.NewDiscovery(registry)
+	userClient := data.NewUserServiceClient(auth, discovery)
+	dataData, cleanup, err := data.NewData(confData, logger, userClient)
 	if err != nil {
 		return nil, nil, err
 	}
-	greeterRepo := data.NewGreeterRepo(dataData, logger)
-	greeterUsecase := biz.NewGreeterUsecase(greeterRepo, logger)
-	greeterService := service.NewGreeterService(greeterUsecase)
-	grpcServer := server.NewGRPCServer(confServer, greeterService, logger)
-	httpServer := server.NewHTTPServer(confServer, greeterService, logger)
-	app := newApp(logger, grpcServer, httpServer)
+	userRepo := data.NewUserRepo(dataData, logger)
+	authUseCase := biz.NewAuthUseCase(auth, userRepo)
+	userUseCase := biz.NewUserUseCase(userRepo, logger, authUseCase)
+	networkInterface := service.NewNetworkInterface(userUseCase, authUseCase, logger)
+	grpcServer := server.NewGRPCServer(confServer, auth, logger, networkInterface)
+	httpServer := server.NewHTTPServer(confServer, auth, logger, networkInterface)
+	registrar := data.NewRegistrar(registry)
+	app := newApp(logger, grpcServer, httpServer, registrar)
 	return app, func() {
 		cleanup()
 	}, nil

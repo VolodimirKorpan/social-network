@@ -17,7 +17,7 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewDiscovery, NewUserServiceClient)
+var ProviderSet = wire.NewSet(NewData, NewDiscovery, NewUserServiceClient, NewUserRepo, NewRegistrar)
 
 // Data .
 type Data struct {
@@ -26,12 +26,24 @@ type Data struct {
 }
 
 // NewData .
-func NewData(conf *conf.Data, logger log.Logger, uc userv1.UserClient) (*Data, error) {
+func NewData(conf *conf.Data, logger log.Logger, uc userv1.UserClient) (*Data,func(), error) {
 	l := log.NewHelper(log.With(logger, "module", "data"))
-	return &Data{log: l, uc: uc}, nil
+	return &Data{log: l, uc: uc}, func() {}, nil
 }
 
 func NewDiscovery(conf *conf.Registry) registry.Discovery {
+	c := consulAPI.DefaultConfig()
+	c.Address = conf.Consul.Address
+	c.Scheme = conf.Consul.Scheme
+	cli, err := consulAPI.NewClient(c)
+	if err != nil {
+		panic(err)
+	}
+	r := consul.New(cli, consul.WithHealthCheck(false))
+	return r
+}
+
+func NewRegistrar(conf *conf.Registry) registry.Registrar {
 	c := consulAPI.DefaultConfig()
 	c.Address = conf.Consul.Address
 	c.Scheme = conf.Consul.Scheme
