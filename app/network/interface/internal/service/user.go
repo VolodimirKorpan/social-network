@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	v1 "social-network/api/network/interface/v1"
-	"social-network/app/network/internal/biz"
+	"social-network/app/network/interface/internal/biz"
 )
 
 

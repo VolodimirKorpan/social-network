@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	usV1 "social-network/api/user/service/v1"
-	"social-network/app/network/internal/biz"
+	"social-network/app/network/interface/internal/biz"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"golang.org/x/sync/singleflight"

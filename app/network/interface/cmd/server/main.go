@@ -4,7 +4,7 @@ import (
 	"flag"
 	"os"
 
-	"social-network/app/network/internal/conf"
+	"social-network/app/network/interface/internal/conf"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -22,7 +22,7 @@ var (
 	// Name is the name of the compiled software.
 	Name string = "social-network.interface.service"
 	// Version is the version of the compiled software.
-	Version string = "0.0.1"
+	Version string
 	// flagconf is the config flag.
 	flagconf string
 

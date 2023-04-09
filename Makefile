@@ -91,7 +91,7 @@ docker:
 .PHONY: wire
 # generate wire
 wire:
-	cd cmd/network && wire
+	cd cmd/server && wire
 
 
 .PHONY: api

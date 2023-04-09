@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 	v1 "social-network/api/network/interface/v1"
-	"social-network/app/network/internal/conf"
-	"social-network/app/network/internal/service"
+	"social-network/app/network/interface/internal/conf"
+	"social-network/app/network/interface/internal/service"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"

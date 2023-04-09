@@ -3,7 +3,7 @@ package data
 import (
 	"context"
 	userv1 "social-network/api/user/service/v1"
-	"social-network/app/network/internal/conf"
+	"social-network/app/network/interface/internal/conf"
 
 	consul "github.com/go-kratos/kratos/contrib/registry/consul/v2"
 	"github.com/go-kratos/kratos/v2/log"

@@ -5,7 +5,7 @@ import (
 	"github.com/google/wire"
 
 	v1 "social-network/api/network/interface/v1"
-	"social-network/app/network/internal/biz"
+	"social-network/app/network/interface/internal/biz"
 )
 
 // ProviderSet is service providers.
