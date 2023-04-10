@@ -16,7 +16,6 @@ type userRepo struct {
 
 type User struct {
 	ID           int64
-	Email        string
 	Username     string
 	HashPassword string
 	CreateAt     time.Time
@@ -35,7 +34,7 @@ func (r *userRepo) CreateUser(ctx context.Context, u *biz.User) (*biz.User, erro
 	if err != nil {
 		return nil, err
 	}
-	user := User{Username: u.Username, Email: u.Email, HashPassword: ph}
+	user := User{Username: u.Username, HashPassword: ph, CreateAt: time.Now(), UpdateAt: time.Now()}
 	result := r.data.DB(ctx).Create(&user)
 	return &biz.User{ID: user.ID, Username: user.Username}, result.Error
 }

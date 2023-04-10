@@ -51,14 +51,14 @@ func NewRegistrar(conf *conf.Registry) registry.Registrar {
 	if err != nil {
 		panic(err)
 	}
-	r := consul.New(cli, consul.WithHealthCheck(false))
+	r := consul.New(cli, consul.WithHealthCheck(true))
 	return r
 }
 
 func NewUserServiceClient(ac *conf.Auth, r registry.Discovery) userv1.UserClient {
 	conn, err := grpc.DialInsecure(
 		context.Background(),
-		grpc.WithEndpoint("discovery:///social-network.api.user.service"),
+		grpc.WithEndpoint("discovery:///social-network.user.service"),
 		grpc.WithDiscovery(r),
 		grpc.WithMiddleware(
 			recovery.Recovery(),
