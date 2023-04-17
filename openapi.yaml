@@ -91,6 +91,8 @@ components:
         LoginReply:
             type: object
             properties:
+                userId:
+                    type: string
                 token:
                     type: string
         LoginReq:
@@ -110,8 +112,7 @@ components:
             type: object
             properties:
                 id:
-                    type: integer
-                    format: int64
+                    type: string
         RegisterReq:
             type: object
             properties:

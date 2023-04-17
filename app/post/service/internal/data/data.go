@@ -2,24 +2,21 @@ package data
 
 import (
 	"context"
-	"social-network/app/user/service/internal/conf"
+	"social-network/app/post/service/internal/conf"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-
-	// init mysql driver
-	_ "github.com/go-sql-driver/mysql"
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewGormClient, NewData, NewUserRepo)
+var ProviderSet = wire.NewSet(NewData, NewGormClient, NewPostRepo)
 
 // Data .
 type Data struct {
-	db *gorm.DB
+	db  *gorm.DB
 	log *log.Helper
 }
 
@@ -42,7 +39,7 @@ func (d *Data) DB(ctx context.Context) *gorm.DB {
 
 // NewData .
 func NewData(db *gorm.DB, logger log.Logger) (*Data, func(), error) {
-	l := log.NewHelper(log.With(logger, "module", "user-service/data"))
+	l := log.NewHelper(log.With(logger, "module", "post-service/data"))
 	d := &Data{
 		db:  db,
 		log: l,
@@ -53,7 +50,7 @@ func NewData(db *gorm.DB, logger log.Logger) (*Data, func(), error) {
 
 // NewGormClient gorm Connecting to a Database
 func NewGormClient(conf *conf.Data, logger log.Logger) *gorm.DB {
-	log := log.NewHelper(log.With(logger, "module", "user-service/data/gorm"))
+	log := log.NewHelper(log.With(logger, "module", "post-service/data/gorm"))
 
 	db, err := gorm.Open(mysql.Open(conf.Database.Source), &gorm.Config{
 		NowFunc: func() time.Time {
@@ -63,7 +60,7 @@ func NewGormClient(conf *conf.Data, logger log.Logger) *gorm.DB {
 	if err != nil {
 		log.Fatalf("failed opening connection to mysql: %v", err)
 	}
-	if err := db.AutoMigrate(&User{}); err != nil {
+	if err := db.AutoMigrate(&Post{}, &Comment{}, &Like{}); err != nil {
 		log.Fatal(err)
 	}
 	return db

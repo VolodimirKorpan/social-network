@@ -2,23 +2,37 @@ package biz
 
 import (
 	"context"
-	"math/rand"
 	v1 "social-network/api/user/service/v1"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
 
 type User struct {
-	ID       int64
-	Username string
-	Password string
+	ID         string
+	Username   string
+	Password   string
+	Avatar     string
+	Bio        string
+	Followers  []Follow
+	Followings []Follow
+}
+
+type Follow struct {
+	Follower    User
+	FollowerID  string
+	Following   User
+	FollowingID string
 }
 
 type UserRepo interface {
 	CreateUser(ctx context.Context, u *User) (*User, error)
-	GetUser(ctx context.Context, id int64) (*User, error)
+	GetUser(ctx context.Context, id string) (*User, error)
 	VerifyPassword(ctx context.Context, u *User) (bool, error)
 	FindByUsername(ctx context.Context, username string) (*User, error)
+	UpdateUser(ctx context.Context, u *User) error
+	AddFollower(ctx context.Context, u *User, followerID string) error
+	RemoveFollower(ctx context.Context, u *User, followerID string) error
+	IsFollower(ctx context.Context, userID, followerID string) (bool, error)
 }
 
 type UserUseCase struct {
@@ -30,9 +44,9 @@ func NewUserUseCase(repo UserRepo, logger log.Logger) *UserUseCase {
 	return &UserUseCase{repo: repo, log: log.NewHelper(log.With(logger, "module", "usecase/user"))}
 }
 
-func (uc *UserUseCase) Save(ctx context.Context, in *v1.SaveUserReq) (*v1.SaveUserReply, error) {
+func (uc *UserUseCase) Save(ctx context.Context, in *User) (*User, error) {
 	user := &User{
-		ID:       rand.Int63(),
+		// ID:       rand.Uint32(),
 		Username: in.Username,
 		Password: in.Password,
 	}
@@ -41,8 +55,8 @@ func (uc *UserUseCase) Save(ctx context.Context, in *v1.SaveUserReq) (*v1.SaveUs
 		// todo: handle error
 		return nil, err
 	}
-	return &v1.SaveUserReply{
-		Id: user.ID,
+	return &User{
+		ID: user.ID,
 	}, nil
 }
 
@@ -66,7 +80,7 @@ func (uc *UserUseCase) Create(ctx context.Context, u *User) (*User, error) {
 	return out, nil
 }
 
-func (uc *UserUseCase) Get(ctx context.Context, id int64) (*User, error) {
+func (uc *UserUseCase) Get(ctx context.Context, id string) (*User, error) {
 	return uc.repo.GetUser(ctx, id)
 }
 

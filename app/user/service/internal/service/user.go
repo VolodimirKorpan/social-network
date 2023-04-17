@@ -48,5 +48,16 @@ func (s *UserService) GetUserByUsername(ctx context.Context, in *v1.GetUserByUse
 }
 
 func (s *UserService) Save(ctx context.Context, in *v1.SaveUserReq) (*v1.SaveUserReply, error) {
-	return s.uc.Save(ctx, in)
+	u := &biz.User{
+		Username: in.Username,
+		Password: in.Password,
+	}
+	user, err := s.uc.Save(ctx, u)
+	if err != nil {
+		return nil, err
+	}
+	s.log.Debug(user.ID)
+	return &v1.SaveUserReply{
+		Id: user.ID,
+	}, nil
 }

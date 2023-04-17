@@ -20,15 +20,23 @@ service User {
 
     rpc ListUser(ListUserReq) returns (ListUserReply) {
     }
+    
+    rpc VerifyPassword(VerifyPasswordReq) returns (VerifyPasswordReply) {
+    }
 }
 
 message GetUserReq {
-    int64 id = 1;
+    string id = 1;
 }
 
 message GetUserReply {
-    int64 id = 1;
+    string id = 1;
     string username = 2;
+    string avatar = 3;
+    string bio = 4;
+    message Followers {
+        
+    }
 }
 
 message GetUserByUsernameReq {
@@ -36,7 +44,7 @@ message GetUserByUsernameReq {
 }
 
 message GetUserByUsernameReply {
-    int64 id = 1;
+    string id = 1;
     string username = 2;
 }
 
@@ -46,17 +54,17 @@ message CreateUserReq {
 }
 
 message CreateUserReply {
-    int64 id = 1;
+    string id = 1;
     string username = 2;
 }
 
 message ListUserReq {
-    int64 id = 1;
+    string id = 1;
 }
 
 message ListUserReply {
     message User {
-        int64 id = 1;
+        string id = 1;
         string name = 2;
     }
     repeated User results = 1;
@@ -70,15 +78,14 @@ message VerifyPasswordReq {
 
 message VerifyPasswordReply {
     bool ok = 1;
-    int64 id = 2;
+    string id = 2;
 }
 
 message SaveUserReq {
-    int64 id = 1;
     string username = 2;
     string password = 3;
 }
 
 message SaveUserReply {
-    int64 id = 1;
+    string id = 1;
 }

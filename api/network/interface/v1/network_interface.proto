@@ -28,6 +28,14 @@ service NetworkInterface {
             body: "*"
         };
     }
+
+    rpc GetUser (GetUserRequest) returns (GetUserReply) {
+        option (google.api.http) = {
+            get: "v1/user{id}"
+        };
+    }
+
+    
 }
 
 message RegisterReq {
@@ -36,7 +44,7 @@ message RegisterReq {
 }
 
 message RegisterReply {
-    int64 id = 1;
+    string id = 1;
 }
 
 
@@ -46,7 +54,8 @@ message LoginReq {
 }
 
 message LoginReply {
-    string token = 1;
+    string userId = 1;
+    string token = 2;
 }
 
 message LogoutReq {
@@ -55,4 +64,12 @@ message LogoutReq {
 
 message LogoutReply {
 
+}
+
+message GetUserRequest {
+    string id = 1;
+}
+
+message GetUserRequest {
+    
 }

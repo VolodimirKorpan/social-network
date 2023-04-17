@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package api.post.service.v1;
+
+option go_package = "social-network/api/post/service/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.post.service.v1";
+
+service Post {
+	rpc CreatePost (CreatePostRequest) returns (CreatePostReply) {}
+	rpc GetPostByID (GetPostByIDRequest) returns (GetPostByIDReply) {}
+	rpc GetPostsByUserID (GetPostsByUserIDRequest) returns (GetPostsByUserIDReply) {}
+}
+
+message CreatePostRequest {
+	string userId = 1;
+	string title = 2;
+	string text = 3;	
+}
+message CreatePostReply {
+	string id = 1;
+}
+
+message GetPostByIDRequest {
+	string id = 1;
+}
+
+message GetPostByIDReply {
+	string id = 1;
+	string userId = 2;
+	string title = 3;
+	string text = 4;
+}
+
+message GetPostsByUserIDRequest {
+	string id = 1;
+}
+
+message GetPostsByUserIDReply {
+	message Post {
+		string id = 1;
+		string userId = 2;
+		string title = 3;
+		string text = 4;
+	}
+	repeated Post posts = 1;
+}

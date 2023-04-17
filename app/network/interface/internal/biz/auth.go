@@ -3,6 +3,7 @@ package biz
 import (
 	"context"
 	"errors"
+	"fmt"
 	v1 "social-network/api/network/interface/v1"
 	"social-network/app/network/interface/internal/conf"
 
@@ -44,7 +45,9 @@ func (receiver *AuthUseCase) Login(ctx context.Context, req *v1.LoginReq) (*v1.L
 	if err != nil {
 		return nil, v1.ErrorLoginFailed("generate token failed: %s", err.Error())
 	}
+	fmt.Println(user.ID)
 	return &v1.LoginReply{
+		UserId: user.ID,
 		Token: signedString,
 	}, nil
 }
@@ -61,11 +64,12 @@ func (receiver *AuthUseCase) Register(ctx context.Context, req *v1.RegisterReq) 
 		return nil, v1.ErrorRegisterFailed("create user failed: %s", err.Error())
 	}
 	//save user
-	err = receiver.userRepo.Save(ctx, &user)
+	userId, err := receiver.userRepo.Save(ctx, &user)
 	if err != nil {
 		return nil, v1.ErrorRegisterFailed("save user failed: %s", err.Error())
 	}
+
 	return &v1.RegisterReply{
-		Id: user.ID,
+		Id: userId,
 	}, nil
 }

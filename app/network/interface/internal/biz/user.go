@@ -3,7 +3,6 @@ package biz
 import (
 	"context"
 	"errors"
-	"math/rand"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -15,9 +14,20 @@ var (
 )
 
 type User struct {
-	ID       int64
-	Username string
-	Password string
+	ID         string
+	Username   string
+	Password   string
+	Avatar     string
+	Bio        string
+	Followers  []Follow
+	Followings []Follow
+}
+
+type Follow struct {
+	Follower    User
+	FollowerID  string
+	Following   User
+	FollowingID string
 }
 
 func NewUser(
@@ -33,16 +43,15 @@ func NewUser(
 		return User{}, ErrPasswordInvalid
 	}
 	return User{
-		ID:       rand.Int63(),
 		Username: username,
 		Password: password,
 	}, nil
 }
 
 type UserRepo interface {
-	Find(ctx context.Context, id int64) (*User, error)
+	Find(ctx context.Context, id string) (*User, error)
 	FindByUsername(ctx context.Context, username string) (*User, error)
-	Save(ctx context.Context, u *User) error
+	Save(ctx context.Context, u *User) (string, error)
 
 	VerifyPassword(ctx context.Context, u *User, password string) error
 }
