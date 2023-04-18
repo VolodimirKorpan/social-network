@@ -25,11 +25,28 @@ func (s *UserService) GetUser(ctx context.Context, req *v1.GetUserReq) (*v1.GetU
 	if err != nil {
 		return nil, err
 	}
-
-	return &v1.GetUserReply{
-		Id:       rv.ID,
-		Username: rv.Username,
-	}, nil
+	
+	res := &v1.GetUserReply{
+		User: &v1.User{
+			Id:        rv.ID,
+			Username:  rv.Username,
+			Avatar:    rv.Avatar,
+			Bio:       rv.Bio,
+		},
+	}
+	for _, follower := range rv.Followers {
+		res.User.Followers = append(res.User.Followers, &v1.Follow{
+			FollowerId: follower.FollowerID,
+			FollowingId: follower.FollowingID,
+		})
+	}
+	for _, following := range rv.Followings {
+		res.User.Followings = append(res.User.Followings, &v1.Follow{
+			FollowerId: following.FollowerID,
+			FollowingId: following.FollowingID,
+		})
+	}
+	return res, nil
 }
 
 func (s *UserService) VerifyPassword(ctx context.Context, req *v1.VerifyPasswordReq) (*v1.VerifyPasswordReply, error) {
@@ -47,17 +64,15 @@ func (s *UserService) GetUserByUsername(ctx context.Context, in *v1.GetUserByUse
 	return s.uc.GetUserByUsername(ctx, in)
 }
 
-// func (s *UserService) Save(ctx context.Context, in *v1.SaveUserReq) (*v1.SaveUserReply, error) {
-// 	u := &biz.User{
-// 		Username: in.Username,
-// 		Password: in.Password,
-// 	}
-// 	user, err := s.uc.Save(ctx, u)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	s.log.Debug(user.ID)
-// 	return &v1.SaveUserReply{
-// 		Id: user.ID,
-// 	}, nil
-// }
+func (s *UserService) AddFollower(ctx context.Context, in *v1.AddFollowerReq) (*v1.AddFollowerReply, error) {
+	msg, err := s.uc.AddFollower(ctx, &models.User{
+		ID:        in.UserId,
+	}, in.FollowerId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.AddFollowerReply{
+		Message: msg,
+	}, nil
+}

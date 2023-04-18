@@ -22,11 +22,11 @@ var ProviderSet = wire.NewSet(NewData, NewDiscovery, NewUserServiceClient, NewUs
 // Data .
 type Data struct {
 	log *log.Helper
-	uc  userv1.UserClient
+	uc  userv1.UserServiceClient
 }
 
 // NewData .
-func NewData(conf *conf.Data, logger log.Logger, uc userv1.UserClient) (*Data,func(), error) {
+func NewData(conf *conf.Data, logger log.Logger, uc userv1.UserServiceClient) (*Data,func(), error) {
 	l := log.NewHelper(log.With(logger, "module", "data"))
 	return &Data{log: l, uc: uc}, func() {}, nil
 }
@@ -55,7 +55,7 @@ func NewRegistrar(conf *conf.Registry) registry.Registrar {
 	return r
 }
 
-func NewUserServiceClient(ac *conf.Auth, r registry.Discovery) userv1.UserClient {
+func NewUserServiceClient(ac *conf.Auth, r registry.Discovery) userv1.UserServiceClient {
 	conn, err := grpc.DialInsecure(
 		context.Background(),
 		grpc.WithEndpoint("discovery:///social-network.user.service"),
@@ -70,6 +70,6 @@ func NewUserServiceClient(ac *conf.Auth, r registry.Discovery) userv1.UserClient
 	if err != nil {
 		panic(err)
 	}
-	c := userv1.NewUserClient(conn)
+	c := userv1.NewUserServiceClient(conn)
 	return c
 }

@@ -54,6 +54,7 @@ type UserRepo interface {
 	Save(ctx context.Context, u *User) (string, error)
 
 	VerifyPassword(ctx context.Context, u *User, password string) error
+	AddFollow(ctx context.Context, u *User, followerID string) (string, error)
 }
 
 type UserUseCase struct {
@@ -73,4 +74,12 @@ func NewUserUseCase(repo UserRepo, logger log.Logger, authUc *AuthUseCase) *User
 
 func (uc *UserUseCase) Logout(ctx context.Context, u *User) error {
 	return nil
+}
+
+func (uc *UserUseCase) GetUser(ctx context.Context, id string) (*User, error) {
+	return uc.repo.Find(ctx, id)
+}
+
+func (uc *UserUseCase) AddFollow(ctx context.Context, u *User, followerID string) (string, error) {
+	return uc.repo.AddFollow(ctx, u, followerID)
 }

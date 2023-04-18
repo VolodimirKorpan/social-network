@@ -5,7 +5,7 @@ package api.user.service.v1;
 option go_package = "social-network/api/user/service/v1;v1";
 
 
-service User {
+service UserService {
     rpc GetUser(GetUserReq) returns (GetUserReply) {
     }
 
@@ -23,6 +23,9 @@ service User {
     
     rpc VerifyPassword(VerifyPasswordReq) returns (VerifyPasswordReply) {
     }
+
+    rpc AddFollower(AddFollowerReq) returns (AddFollowerReply) {
+    }
 }
 
 message GetUserReq {
@@ -30,18 +33,21 @@ message GetUserReq {
 }
 
 message GetUserReply {
+    User user = 1;
+}
+message User {
     string id = 1;
     string username = 2;
     string avatar = 3;
     string bio = 4;
     repeated Follow followers = 5;
     repeated Follow followings = 6;
-}
-    
-message Follow {
+  }
+  
+  message Follow {
     string follower_id = 1;
     string following_id = 2;
-}
+  }
 
 message GetUserByUsernameReq {
     string username = 1;
@@ -92,4 +98,13 @@ message SaveUserReq {
 
 message SaveUserReply {
     string id = 1;
+}
+
+message AddFollowerReq {
+    string user_id = 1;
+    string follower_id = 2;
+}
+
+message AddFollowerReply {
+    string message = 1;
 }

@@ -88,3 +88,18 @@ func (uc *UserUseCase) Get(ctx context.Context, id string) (*models.User, error)
 func (uc *UserUseCase) VerifyPassword(ctx context.Context, u *models.User) (bool, error) {
 	return uc.repo.VerifyPassword(ctx, u)
 }
+
+func (uc *UserUseCase) AddFollower(ctx context.Context, u *models.User, followerID string) (string, error) {
+	f, err := uc.repo.IsFollower(ctx, u.ID, followerID)
+	if err != nil {
+		return "false", err
+	}
+	if f {
+		err := uc.repo.AddFollower(ctx, u, followerID)
+		if err != nil {
+			return "", err
+		}
+		return "success", nil	
+	}
+	return "false", nil
+}

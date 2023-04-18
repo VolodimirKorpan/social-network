@@ -19,12 +19,14 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationNetworkInterfaceAddFollower = "/network.interface.v1.NetworkInterface/AddFollower"
 const OperationNetworkInterfaceGetUser = "/network.interface.v1.NetworkInterface/GetUser"
 const OperationNetworkInterfaceLogin = "/network.interface.v1.NetworkInterface/Login"
 const OperationNetworkInterfaceLogout = "/network.interface.v1.NetworkInterface/Logout"
 const OperationNetworkInterfaceRegister = "/network.interface.v1.NetworkInterface/Register"
 
 type NetworkInterfaceHTTPServer interface {
+	AddFollower(context.Context, *AddFollowerReq) (*AddFollowerReply, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserReply, error)
 	Login(context.Context, *LoginReq) (*LoginReply, error)
 	Logout(context.Context, *LogoutReq) (*LogoutReply, error)
@@ -36,7 +38,8 @@ func RegisterNetworkInterfaceHTTPServer(s *http.Server, srv NetworkInterfaceHTTP
 	r.POST("/v1/register", _NetworkInterface_Register0_HTTP_Handler(srv))
 	r.POST("/v1/login", _NetworkInterface_Login0_HTTP_Handler(srv))
 	r.POST("/v1/logout", _NetworkInterface_Logout0_HTTP_Handler(srv))
-	r.GET("v1/users/{id}", _NetworkInterface_GetUser0_HTTP_Handler(srv))
+	r.GET("/v1/users/{id}", _NetworkInterface_GetUser0_HTTP_Handler(srv))
+	r.POST("/v1/users/{id}/follow", _NetworkInterface_AddFollower0_HTTP_Handler(srv))
 }
 
 func _NetworkInterface_Register0_HTTP_Handler(srv NetworkInterfaceHTTPServer) func(ctx http.Context) error {
@@ -118,7 +121,30 @@ func _NetworkInterface_GetUser0_HTTP_Handler(srv NetworkInterfaceHTTPServer) fun
 	}
 }
 
+func _NetworkInterface_AddFollower0_HTTP_Handler(srv NetworkInterfaceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AddFollowerReq
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationNetworkInterfaceAddFollower)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AddFollower(ctx, req.(*AddFollowerReq))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AddFollowerReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type NetworkInterfaceHTTPClient interface {
+	AddFollower(ctx context.Context, req *AddFollowerReq, opts ...http.CallOption) (rsp *AddFollowerReply, err error)
 	GetUser(ctx context.Context, req *GetUserRequest, opts ...http.CallOption) (rsp *GetUserReply, err error)
 	Login(ctx context.Context, req *LoginReq, opts ...http.CallOption) (rsp *LoginReply, err error)
 	Logout(ctx context.Context, req *LogoutReq, opts ...http.CallOption) (rsp *LogoutReply, err error)
@@ -133,9 +159,22 @@ func NewNetworkInterfaceHTTPClient(client *http.Client) NetworkInterfaceHTTPClie
 	return &NetworkInterfaceHTTPClientImpl{client}
 }
 
+func (c *NetworkInterfaceHTTPClientImpl) AddFollower(ctx context.Context, in *AddFollowerReq, opts ...http.CallOption) (*AddFollowerReply, error) {
+	var out AddFollowerReply
+	pattern := "/v1/users/{id}/follow"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationNetworkInterfaceAddFollower))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
 func (c *NetworkInterfaceHTTPClientImpl) GetUser(ctx context.Context, in *GetUserRequest, opts ...http.CallOption) (*GetUserReply, error) {
 	var out GetUserReply
-	pattern := "v1/users/{id}"
+	pattern := "/v1/users/{id}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationNetworkInterfaceGetUser))
 	opts = append(opts, http.PathTemplate(pattern))

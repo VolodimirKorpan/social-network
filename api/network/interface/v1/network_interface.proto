@@ -31,7 +31,14 @@ service NetworkInterface {
 
     rpc GetUser (GetUserRequest) returns (GetUserReply) {
         option (google.api.http) = {
-            get: "v1/users/{id}"
+            get: "/v1/users/{id}"
+        };
+    }
+
+    rpc AddFollower(AddFollowerReq) returns (AddFollowerReply) {
+        option (google.api.http) = {
+            post: "/v1/users/{id}/follow"
+            body: "*"
         };
     }
 
@@ -71,10 +78,28 @@ message GetUserRequest {
 }
 
 message GetUserReply {
+    User user = 1;
+}
+
+message User {
     string id = 1;
     string username = 2;
     string avatar = 3;
     string bio = 4;
-    repeated string followers = 5;
-    repeated string following = 6;
+    repeated Follow followers = 5;
+    repeated Follow followings = 6;
+}
+
+message Follow {
+    string follower_id = 1;
+    string following_id = 2;
+}
+
+message AddFollowerReq {
+    string id = 1;
+    string follower_id = 2;
+}
+
+message AddFollowerReply {
+    string message = 1;
 }

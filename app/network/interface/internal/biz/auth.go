@@ -3,7 +3,6 @@ package biz
 import (
 	"context"
 	"errors"
-	"fmt"
 	v1 "social-network/api/network/interface/v1"
 	"social-network/app/network/interface/internal/conf"
 
@@ -45,10 +44,9 @@ func (receiver *AuthUseCase) Login(ctx context.Context, req *v1.LoginReq) (*v1.L
 	if err != nil {
 		return nil, v1.ErrorLoginFailed("generate token failed: %s", err.Error())
 	}
-	fmt.Println(user.ID)
 	return &v1.LoginReply{
 		UserId: user.ID,
-		Token: signedString,
+		Token:  signedString,
 	}, nil
 }
 

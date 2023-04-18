@@ -45,14 +45,14 @@ func (rp *userRepo) Find(ctx context.Context, id string) (*biz.User, error) {
 		if err != nil {
 			return nil, biz.ErrUserNotFound
 		}
-		return &biz.User{
-			ID:         user.Id,
-			Username:   user.Username,
-			Avatar:     user.Avatar,
-			Bio:        user.Bio,
-			// Followers:  user.Followers,
-			// Followings: user.Followings,
-		}, nil
+
+		res := &biz.User{
+			ID:         user.User.Id,
+			Username:   user.User.Username,
+			Avatar:     user.User.Avatar,
+			Bio:        user.User.Bio,
+		}
+		return res, nil
 	})
 	if err != nil {
 		return nil, err
@@ -91,4 +91,22 @@ func (rp *userRepo) Save(ctx context.Context, u *biz.User) (string, error) {
 	}
 	rp.log.Debug(user)
 	return user.Id, nil
+}
+
+func (rp *userRepo) AddFollow(ctx context.Context, u *biz.User, followerID string) (string, error) {
+	result, err, _ := rp.sg.Do(fmt.Sprintf("add_follower_%s", followerID), func() (interface{}, error) {
+		msg, err := rp.data.uc.AddFollower(ctx, &usV1.AddFollowerReq{
+			FollowerId: followerID,
+			UserId:     u.ID,
+		})
+		if err != nil {
+			return nil, err
+		}
+		rp.log.Debug(msg)
+		return msg, nil
+	})
+	if err != nil {
+		return "", err
+	}
+	return result.(string), nil
 }

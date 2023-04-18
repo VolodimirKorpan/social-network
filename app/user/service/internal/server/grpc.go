@@ -1,7 +1,7 @@
 package server
 
 import (
-	"social-network/api/user/service/v1"
+	v1 "social-network/api/user/service/v1"
 	"social-network/app/user/service/internal/conf"
 	"social-network/app/user/service/internal/service"
 
@@ -34,7 +34,7 @@ func NewGRPCServer(c *conf.Server, ac *conf.Auth, s *service.UserService, logger
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
-	
-	v1.RegisterUserServer(srv, s)
+
+	v1.RegisterUserServiceServer(srv, s)
 	return srv
 }

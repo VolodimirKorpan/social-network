@@ -50,11 +50,19 @@ func (r *userRepo) GetUser(ctx context.Context, id string) (*models.User, error)
 	if err := r.data.DB(ctx).Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
+	if err := r.data.DB(ctx).Model(&user).Association("Followers").Find(&user.Followers); err != nil {
+		return nil, err
+	}
+	if err := r.data.DB(ctx).Model(&user).Association("Followings").Find(&user.Followings); err != nil {
+		return nil, err
+	}
 	return &models.User{
 		ID:       user.ID,
 		Username: user.Username,
 		Avatar:   user.Avatar,
 		Bio:      user.Bio,
+		Followers: user.Followers,
+		Followings: user.Followings,
 	}, nil
 }
 
