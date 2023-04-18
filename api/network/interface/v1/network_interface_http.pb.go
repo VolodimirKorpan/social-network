@@ -19,11 +19,13 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationNetworkInterfaceGetUser = "/network.interface.v1.NetworkInterface/GetUser"
 const OperationNetworkInterfaceLogin = "/network.interface.v1.NetworkInterface/Login"
 const OperationNetworkInterfaceLogout = "/network.interface.v1.NetworkInterface/Logout"
 const OperationNetworkInterfaceRegister = "/network.interface.v1.NetworkInterface/Register"
 
 type NetworkInterfaceHTTPServer interface {
+	GetUser(context.Context, *GetUserRequest) (*GetUserReply, error)
 	Login(context.Context, *LoginReq) (*LoginReply, error)
 	Logout(context.Context, *LogoutReq) (*LogoutReply, error)
 	Register(context.Context, *RegisterReq) (*RegisterReply, error)
@@ -34,6 +36,7 @@ func RegisterNetworkInterfaceHTTPServer(s *http.Server, srv NetworkInterfaceHTTP
 	r.POST("/v1/register", _NetworkInterface_Register0_HTTP_Handler(srv))
 	r.POST("/v1/login", _NetworkInterface_Login0_HTTP_Handler(srv))
 	r.POST("/v1/logout", _NetworkInterface_Logout0_HTTP_Handler(srv))
+	r.GET("v1/users/{id}", _NetworkInterface_GetUser0_HTTP_Handler(srv))
 }
 
 func _NetworkInterface_Register0_HTTP_Handler(srv NetworkInterfaceHTTPServer) func(ctx http.Context) error {
@@ -93,7 +96,30 @@ func _NetworkInterface_Logout0_HTTP_Handler(srv NetworkInterfaceHTTPServer) func
 	}
 }
 
+func _NetworkInterface_GetUser0_HTTP_Handler(srv NetworkInterfaceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetUserRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationNetworkInterfaceGetUser)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetUser(ctx, req.(*GetUserRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetUserReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type NetworkInterfaceHTTPClient interface {
+	GetUser(ctx context.Context, req *GetUserRequest, opts ...http.CallOption) (rsp *GetUserReply, err error)
 	Login(ctx context.Context, req *LoginReq, opts ...http.CallOption) (rsp *LoginReply, err error)
 	Logout(ctx context.Context, req *LogoutReq, opts ...http.CallOption) (rsp *LogoutReply, err error)
 	Register(ctx context.Context, req *RegisterReq, opts ...http.CallOption) (rsp *RegisterReply, err error)
@@ -105,6 +131,19 @@ type NetworkInterfaceHTTPClientImpl struct {
 
 func NewNetworkInterfaceHTTPClient(client *http.Client) NetworkInterfaceHTTPClient {
 	return &NetworkInterfaceHTTPClientImpl{client}
+}
+
+func (c *NetworkInterfaceHTTPClientImpl) GetUser(ctx context.Context, in *GetUserRequest, opts ...http.CallOption) (*GetUserReply, error) {
+	var out GetUserReply
+	pattern := "v1/users/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationNetworkInterfaceGetUser))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
 }
 
 func (c *NetworkInterfaceHTTPClientImpl) Login(ctx context.Context, in *LoginReq, opts ...http.CallOption) (*LoginReply, error) {

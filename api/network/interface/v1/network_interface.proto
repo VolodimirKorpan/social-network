@@ -31,7 +31,7 @@ service NetworkInterface {
 
     rpc GetUser (GetUserRequest) returns (GetUserReply) {
         option (google.api.http) = {
-            get: "v1/user{id}"
+            get: "v1/users/{id}"
         };
     }
 
@@ -70,6 +70,11 @@ message GetUserRequest {
     string id = 1;
 }
 
-message GetUserRequest {
-    
+message GetUserReply {
+    string id = 1;
+    string username = 2;
+    string avatar = 3;
+    string bio = 4;
+    repeated string followers = 5;
+    repeated string following = 6;
 }

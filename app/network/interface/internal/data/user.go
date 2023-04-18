@@ -38,7 +38,7 @@ func (rp *userRepo) VerifyPassword(ctx context.Context, u *biz.User, password st
 }
 
 func (rp *userRepo) Find(ctx context.Context, id string) (*biz.User, error) {
-	result, err, _ := rp.sg.Do(fmt.Sprintf("find_user_by_id_%s", id), func() (interface{}, error) {
+	user, err, _ := rp.sg.Do(fmt.Sprintf("get_user_by_id_%s", id), func() (interface{}, error) {
 		user, err := rp.data.uc.GetUser(ctx, &usV1.GetUserReq{
 			Id: id,
 		})
@@ -46,14 +46,18 @@ func (rp *userRepo) Find(ctx context.Context, id string) (*biz.User, error) {
 			return nil, biz.ErrUserNotFound
 		}
 		return &biz.User{
-			ID:       user.Id,
-			Username: user.Username,
+			ID:         user.Id,
+			Username:   user.Username,
+			Avatar:     user.Avatar,
+			Bio:        user.Bio,
+			// Followers:  user.Followers,
+			// Followings: user.Followings,
 		}, nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*biz.User), nil
+	return user.(*biz.User), nil
 }
 
 func (rp *userRepo) FindByUsername(ctx context.Context, username string) (*biz.User, error) {
@@ -73,7 +77,7 @@ func (rp *userRepo) FindByUsername(ctx context.Context, username string) (*biz.U
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return result.(*biz.User), nil
 }
 
@@ -88,5 +92,3 @@ func (rp *userRepo) Save(ctx context.Context, u *biz.User) (string, error) {
 	rp.log.Debug(user)
 	return user.Id, nil
 }
-
-

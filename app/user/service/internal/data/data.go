@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"social-network/app/user/service/internal/conf"
+	"social-network/app/user/service/internal/models"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -19,7 +20,7 @@ var ProviderSet = wire.NewSet(NewGormClient, NewData, NewUserRepo)
 
 // Data .
 type Data struct {
-	db *gorm.DB
+	db  *gorm.DB
 	log *log.Helper
 }
 
@@ -63,7 +64,7 @@ func NewGormClient(conf *conf.Data, logger log.Logger) *gorm.DB {
 	if err != nil {
 		log.Fatalf("failed opening connection to mysql: %v", err)
 	}
-	if err := db.AutoMigrate(&User{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Follow{}); err != nil {
 		log.Fatal(err)
 	}
 	return db

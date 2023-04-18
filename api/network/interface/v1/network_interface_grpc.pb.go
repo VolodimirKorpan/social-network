@@ -22,6 +22,7 @@ const (
 	NetworkInterface_Register_FullMethodName = "/network.interface.v1.NetworkInterface/Register"
 	NetworkInterface_Login_FullMethodName    = "/network.interface.v1.NetworkInterface/Login"
 	NetworkInterface_Logout_FullMethodName   = "/network.interface.v1.NetworkInterface/Logout"
+	NetworkInterface_GetUser_FullMethodName  = "/network.interface.v1.NetworkInterface/GetUser"
 )
 
 // NetworkInterfaceClient is the client API for NetworkInterface service.
@@ -31,6 +32,7 @@ type NetworkInterfaceClient interface {
 	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterReply, error)
 	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginReply, error)
 	Logout(ctx context.Context, in *LogoutReq, opts ...grpc.CallOption) (*LogoutReply, error)
+	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserReply, error)
 }
 
 type networkInterfaceClient struct {
@@ -68,6 +70,15 @@ func (c *networkInterfaceClient) Logout(ctx context.Context, in *LogoutReq, opts
 	return out, nil
 }
 
+func (c *networkInterfaceClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserReply, error) {
+	out := new(GetUserReply)
+	err := c.cc.Invoke(ctx, NetworkInterface_GetUser_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NetworkInterfaceServer is the server API for NetworkInterface service.
 // All implementations must embed UnimplementedNetworkInterfaceServer
 // for forward compatibility
@@ -75,6 +86,7 @@ type NetworkInterfaceServer interface {
 	Register(context.Context, *RegisterReq) (*RegisterReply, error)
 	Login(context.Context, *LoginReq) (*LoginReply, error)
 	Logout(context.Context, *LogoutReq) (*LogoutReply, error)
+	GetUser(context.Context, *GetUserRequest) (*GetUserReply, error)
 	mustEmbedUnimplementedNetworkInterfaceServer()
 }
 
@@ -90,6 +102,9 @@ func (UnimplementedNetworkInterfaceServer) Login(context.Context, *LoginReq) (*L
 }
 func (UnimplementedNetworkInterfaceServer) Logout(context.Context, *LogoutReq) (*LogoutReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
+}
+func (UnimplementedNetworkInterfaceServer) GetUser(context.Context, *GetUserRequest) (*GetUserReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
 func (UnimplementedNetworkInterfaceServer) mustEmbedUnimplementedNetworkInterfaceServer() {}
 
@@ -158,6 +173,24 @@ func _NetworkInterface_Logout_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NetworkInterface_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkInterfaceServer).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NetworkInterface_GetUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkInterfaceServer).GetUser(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NetworkInterface_ServiceDesc is the grpc.ServiceDesc for NetworkInterface service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -176,6 +209,10 @@ var NetworkInterface_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Logout",
 			Handler:    _NetworkInterface_Logout_Handler,
+		},
+		{
+			MethodName: "GetUser",
+			Handler:    _NetworkInterface_GetUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

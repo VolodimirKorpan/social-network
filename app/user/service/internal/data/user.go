@@ -3,11 +3,10 @@ package data
 import (
 	"context"
 	"social-network/app/user/service/internal/biz"
+	"social-network/app/user/service/internal/models"
 	"social-network/app/user/service/internal/pkg/util"
 
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -16,31 +15,6 @@ type userRepo struct {
 	log  *log.Helper
 }
 
-type User struct {
-	gorm.Model
-	ID           string `sql:"type:uuid;primary_key;default:uuid_generate_v4()"`
-	Username     string `gorm:"not null,unique_index"`
-	HashPassword string `gorm:"not null"`
-	Avatar       string
-	Bio          string
-	Followers    []Follow `gorm:"foreignkey:FollowingID"`
-	Followings   []Follow `gorm:"foreignkey:FollowerID"`
-}
-
-type Follow struct {
-	gorm.Model
-	Follower    User
-	FollowerID  string `gorm:"primaryKey" sql:"type:uuid not null"`
-	Following   User
-	FollowingID string `gorm:"primary_key" sql:"type:uuid not null"`
-}
-
-func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
-	u.ID = uuid.NewString()
-	return
-}
-
-
 func NewUserRepo(data *Data, logger log.Logger) biz.UserRepo {
 	return &userRepo{
 		data: data,
@@ -48,61 +22,61 @@ func NewUserRepo(data *Data, logger log.Logger) biz.UserRepo {
 	}
 }
 
-func (r *userRepo) CreateUser(ctx context.Context, u *biz.User) (*biz.User, error) {
+func (r *userRepo) CreateUser(ctx context.Context, u *models.User) (*models.User, error) {
 	ph, err := util.HashPassword(u.Password)
 	if err != nil {
 		return nil, err
 	}
-	user := User{Username: u.Username, HashPassword: ph}
+	user := &models.User{Username: u.Username, Password: ph}
 	if err := r.data.DB(ctx).Omit(clause.Associations).Create(&user).Error; err != nil {
 		return nil, err
 	}
-	return &biz.User{ID: user.ID, Username: user.Username}, nil
+	return &models.User{ID: user.ID, Username: user.Username}, nil
 }
 
-func (r *userRepo) FindByUsername(ctx context.Context, username string) (*biz.User, error) {
-	var user User
+func (r *userRepo) FindByUsername(ctx context.Context, username string) (*models.User, error) {
+	var user models.User
 	if err := r.data.DB(ctx).Where("username = ?", username).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &biz.User{
+	return &models.User{
 		ID:       user.ID,
 		Username: user.Username,
-		Password: user.HashPassword,
+		Password: user.Password,
 	}, nil
 }
-func (r *userRepo) GetUser(ctx context.Context, id string) (*biz.User, error) {
-	var user User
+func (r *userRepo) GetUser(ctx context.Context, id string) (*models.User, error) {
+	var user models.User
 	if err := r.data.DB(ctx).Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &biz.User{
+	return &models.User{
 		ID:       user.ID,
 		Username: user.Username,
-		Avatar: user.Avatar,
-		Bio: user.Bio,
+		Avatar:   user.Avatar,
+		Bio:      user.Bio,
 	}, nil
 }
 
-func (r *userRepo) VerifyPassword(ctx context.Context, u *biz.User) (bool, error) {
-	var user User
+func (r *userRepo) VerifyPassword(ctx context.Context, u *models.User) (bool, error) {
+	var user models.User
 	result := r.data.DB(ctx).Where("username = ?", u.Username).First(&user)
-	return util.CheckPasswordHash(u.Password, user.HashPassword), result.Error
+	return util.CheckPasswordHash(u.Password, user.Password), result.Error
 }
 
-func (r *userRepo) UpdateUser(ctx context.Context, u *biz.User) error {
+func (r *userRepo) UpdateUser(ctx context.Context, u *models.User) error {
 	return r.data.DB(ctx).Updates(&u).Error
 }
 
-func (r *userRepo) AddFollower(ctx context.Context, u *biz.User, followerID string) error {
-	if err := r.data.DB(ctx).Model(u).Association("Followers").Append(Follow{FollowerID: followerID, FollowingID: u.ID}); err != nil {
+func (r *userRepo) AddFollower(ctx context.Context, u *models.User, followerID string) error {
+	if err := r.data.DB(ctx).Model(u).Association("Followers").Append(models.Follow{FollowerID: followerID, FollowingID: u.ID}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *userRepo) RemoveFollower(ctx context.Context, u *biz.User, followerID string) error {
-	f := Follow{
+func (r *userRepo) RemoveFollower(ctx context.Context, u *models.User, followerID string) error {
+	f := models.Follow{
 		FollowerID:  followerID,
 		FollowingID: u.ID,
 	}
@@ -116,7 +90,7 @@ func (r *userRepo) RemoveFollower(ctx context.Context, u *biz.User, followerID s
 }
 
 func (r *userRepo) IsFollower(ctx context.Context, userID, followerID string) (bool, error) {
-	var f Follow
+	var f models.Follow
 	if err := r.data.DB(ctx).Where("following_id = ? and follower_id = ?", userID, followerID).Find(&f).Error; err != nil {
 		return false, err
 	}

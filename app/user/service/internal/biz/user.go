@@ -3,35 +3,36 @@ package biz
 import (
 	"context"
 	v1 "social-network/api/user/service/v1"
+	"social-network/app/user/service/internal/models"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
 
-type User struct {
-	ID         string
-	Username   string
-	Password   string
-	Avatar     string
-	Bio        string
-	Followers  []Follow
-	Followings []Follow
-}
+// type models.User struct {
+// 	ID         string
+// 	Username   string
+// 	Password   string
+// 	Avatar     string
+// 	Bio        string
+// 	Followers  []*Follow
+// 	Followings []*Follow
+// }
 
-type Follow struct {
-	Follower    User
-	FollowerID  string
-	Following   User
-	FollowingID string
-}
+// type Follow struct {
+// 	Follower    models.User
+// 	FollowerID  string
+// 	Following   models.User
+// 	FollowingID string
+// }
 
 type UserRepo interface {
-	CreateUser(ctx context.Context, u *User) (*User, error)
-	GetUser(ctx context.Context, id string) (*User, error)
-	VerifyPassword(ctx context.Context, u *User) (bool, error)
-	FindByUsername(ctx context.Context, username string) (*User, error)
-	UpdateUser(ctx context.Context, u *User) error
-	AddFollower(ctx context.Context, u *User, followerID string) error
-	RemoveFollower(ctx context.Context, u *User, followerID string) error
+	CreateUser(ctx context.Context, u *models.User) (*models.User, error)
+	GetUser(ctx context.Context, id string) (*models.User, error)
+	VerifyPassword(ctx context.Context, u *models.User) (bool, error)
+	FindByUsername(ctx context.Context, username string) (*models.User, error)
+	UpdateUser(ctx context.Context, u *models.User) error
+	AddFollower(ctx context.Context, u *models.User, followerID string) error
+	RemoveFollower(ctx context.Context, u *models.User, followerID string) error
 	IsFollower(ctx context.Context, userID, followerID string) (bool, error)
 }
 
@@ -44,8 +45,8 @@ func NewUserUseCase(repo UserRepo, logger log.Logger) *UserUseCase {
 	return &UserUseCase{repo: repo, log: log.NewHelper(log.With(logger, "module", "usecase/user"))}
 }
 
-func (uc *UserUseCase) Save(ctx context.Context, in *User) (*User, error) {
-	user := &User{
+func (uc *UserUseCase) Save(ctx context.Context, in *models.User) (*models.User, error) {
+	user := &models.User{
 		// ID:       rand.Uint32(),
 		Username: in.Username,
 		Password: in.Password,
@@ -55,7 +56,7 @@ func (uc *UserUseCase) Save(ctx context.Context, in *User) (*User, error) {
 		// todo: handle error
 		return nil, err
 	}
-	return &User{
+	return &models.User{
 		ID: user.ID,
 	}, nil
 }
@@ -72,7 +73,7 @@ func (uc *UserUseCase) GetUserByUsername(ctx context.Context, in *v1.GetUserByUs
 	}, nil
 }
 
-func (uc *UserUseCase) Create(ctx context.Context, u *User) (*User, error) {
+func (uc *UserUseCase) Create(ctx context.Context, u *models.User) (*models.User, error) {
 	out, err := uc.repo.CreateUser(ctx, u)
 	if err != nil {
 		return nil, err
@@ -80,10 +81,10 @@ func (uc *UserUseCase) Create(ctx context.Context, u *User) (*User, error) {
 	return out, nil
 }
 
-func (uc *UserUseCase) Get(ctx context.Context, id string) (*User, error) {
+func (uc *UserUseCase) Get(ctx context.Context, id string) (*models.User, error) {
 	return uc.repo.GetUser(ctx, id)
 }
 
-func (uc *UserUseCase) VerifyPassword(ctx context.Context, u *User) (bool, error) {
+func (uc *UserUseCase) VerifyPassword(ctx context.Context, u *models.User) (bool, error) {
 	return uc.repo.VerifyPassword(ctx, u)
 }

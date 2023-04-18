@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 	v1 "social-network/api/user/service/v1"
-	"social-network/app/user/service/internal/biz"
+	"social-network/app/user/service/internal/models"
 )
 
 func (s *UserService) CreateUser(ctx context.Context, req *v1.CreateUserReq) (*v1.CreateUserReply, error) {
-	rv, err := s.uc.Create(ctx, &biz.User{
+	rv, err := s.uc.Create(ctx, &models.User{
 		Username: req.Username,
 		Password: req.Password,
 	})
@@ -33,7 +33,7 @@ func (s *UserService) GetUser(ctx context.Context, req *v1.GetUserReq) (*v1.GetU
 }
 
 func (s *UserService) VerifyPassword(ctx context.Context, req *v1.VerifyPasswordReq) (*v1.VerifyPasswordReply, error) {
-	rv, err := s.uc.VerifyPassword(ctx, &biz.User{Username: req.Username, Password: req.Password})
+	rv, err := s.uc.VerifyPassword(ctx, &models.User{Username: req.Username, Password: req.Password})
 	if err != nil {
 		return nil, err
 	}
@@ -47,17 +47,17 @@ func (s *UserService) GetUserByUsername(ctx context.Context, in *v1.GetUserByUse
 	return s.uc.GetUserByUsername(ctx, in)
 }
 
-func (s *UserService) Save(ctx context.Context, in *v1.SaveUserReq) (*v1.SaveUserReply, error) {
-	u := &biz.User{
-		Username: in.Username,
-		Password: in.Password,
-	}
-	user, err := s.uc.Save(ctx, u)
-	if err != nil {
-		return nil, err
-	}
-	s.log.Debug(user.ID)
-	return &v1.SaveUserReply{
-		Id: user.ID,
-	}, nil
-}
+// func (s *UserService) Save(ctx context.Context, in *v1.SaveUserReq) (*v1.SaveUserReply, error) {
+// 	u := &biz.User{
+// 		Username: in.Username,
+// 		Password: in.Password,
+// 	}
+// 	user, err := s.uc.Save(ctx, u)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	s.log.Debug(user.ID)
+// 	return &v1.SaveUserReply{
+// 		Id: user.ID,
+// 	}, nil
+// }
