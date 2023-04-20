@@ -58,13 +58,13 @@ func NewGormClient(conf *conf.Data, logger log.Logger) *gorm.DB {
 
 	db, err := gorm.Open(mysql.Open(conf.Database.Source), &gorm.Config{
 		NowFunc: func() time.Time {
-			return time.Now().Local()
+			return time.Now()
 		},
 	})
 	if err != nil {
 		log.Fatalf("failed opening connection to mysql: %v", err)
 	}
-	if err := db.AutoMigrate(&models.User{}, &models.Follow{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Friendship{}); err != nil {
 		log.Fatal(err)
 	}
 	return db

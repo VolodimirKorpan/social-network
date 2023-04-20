@@ -31,9 +31,9 @@ type UserRepo interface {
 	VerifyPassword(ctx context.Context, u *models.User) (bool, error)
 	FindByUsername(ctx context.Context, username string) (*models.User, error)
 	UpdateUser(ctx context.Context, u *models.User) error
-	AddFollower(ctx context.Context, u *models.User, followerID string) error
-	RemoveFollower(ctx context.Context, u *models.User, followerID string) error
-	IsFollower(ctx context.Context, userID, followerID string) (bool, error)
+	AddFriend(ctx context.Context, userID, friendID string) error
+	// RemoveFollower(ctx context.Context, u *models.User, followerID string) error
+	//IsFollower(ctx context.Context, userID, followerID string) (bool, error)
 }
 
 type UserUseCase struct {
@@ -89,17 +89,14 @@ func (uc *UserUseCase) VerifyPassword(ctx context.Context, u *models.User) (bool
 	return uc.repo.VerifyPassword(ctx, u)
 }
 
-func (uc *UserUseCase) AddFollower(ctx context.Context, u *models.User, followerID string) (string, error) {
-	f, err := uc.repo.IsFollower(ctx, u.ID, followerID)
+// Adds a follower to a user's list of followers
+//
+// Returns "success" on success, "false" if the follower already exists,
+// and an error otherwise.
+func (uc *UserUseCase) AddFollower(ctx context.Context, user *models.User, followerID string) (string, error) {
+	err := uc.repo.AddFriend(ctx, user.ID, followerID)
 	if err != nil {
-		return "false", err
+		return "", err
 	}
-	if f {
-		err := uc.repo.AddFollower(ctx, u, followerID)
-		if err != nil {
-			return "", err
-		}
-		return "success", nil	
-	}
-	return "false", nil
+	return "success", nil
 }

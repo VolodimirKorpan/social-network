@@ -3,6 +3,7 @@ package biz
 import (
 	"context"
 	"errors"
+	"social-network/app/network/interface/internal/models"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -13,48 +14,31 @@ var (
 	ErrUserNotFound    = errors.New("user not found")
 )
 
-type User struct {
-	ID         string
-	Username   string
-	Password   string
-	Avatar     string
-	Bio        string
-	Followers  []Follow
-	Followings []Follow
-}
-
-type Follow struct {
-	Follower    User
-	FollowerID  string
-	Following   User
-	FollowingID string
-}
-
 func NewUser(
 	username string,
 	password string,
-) (User, error) {
+) (models.User, error) {
 
 	// check username
 	if len(username) <= 0 {
-		return User{}, ErrUsernameInvalid
+		return models.User{}, ErrUsernameInvalid
 	}
 	if len(password) <= 4 {
-		return User{}, ErrPasswordInvalid
+		return models.User{}, ErrPasswordInvalid
 	}
-	return User{
+	return models.User{
 		Username: username,
 		Password: password,
 	}, nil
 }
 
 type UserRepo interface {
-	Find(ctx context.Context, id string) (*User, error)
-	FindByUsername(ctx context.Context, username string) (*User, error)
-	Save(ctx context.Context, u *User) (string, error)
+	Find(ctx context.Context, id string) (*models.User, error)
+	FindByUsername(ctx context.Context, username string) (*models.User, error)
+	Save(ctx context.Context, u *models.User) (string, error)
 
-	VerifyPassword(ctx context.Context, u *User, password string) error
-	AddFollow(ctx context.Context, u *User, followerID string) (string, error)
+	VerifyPassword(ctx context.Context, u *models.User, password string) error
+	AddFollow(ctx context.Context, u *models.User, followerID string) (string, error)
 }
 
 type UserUseCase struct {
@@ -72,14 +56,14 @@ func NewUserUseCase(repo UserRepo, logger log.Logger, authUc *AuthUseCase) *User
 	}
 }
 
-func (uc *UserUseCase) Logout(ctx context.Context, u *User) error {
+func (uc *UserUseCase) Logout(ctx context.Context, u *models.User) error {
 	return nil
 }
 
-func (uc *UserUseCase) GetUser(ctx context.Context, id string) (*User, error) {
+func (uc *UserUseCase) GetUser(ctx context.Context, id string) (*models.User, error) {
 	return uc.repo.Find(ctx, id)
 }
 
-func (uc *UserUseCase) AddFollow(ctx context.Context, u *User, followerID string) (string, error) {
+func (uc *UserUseCase) AddFollow(ctx context.Context, u *models.User, followerID string) (string, error) {
 	return uc.repo.AddFollow(ctx, u, followerID)
 }

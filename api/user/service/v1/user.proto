@@ -40,14 +40,14 @@ message User {
     string username = 2;
     string avatar = 3;
     string bio = 4;
-    repeated Follow followers = 5;
-    repeated Follow followings = 6;
-  }
+    repeated Friendship friends = 5;
+}
   
-  message Follow {
-    string follower_id = 1;
-    string following_id = 2;
-  }
+message Friendship {
+    string requester_id = 1;
+    string requestee_id = 2;
+    string status = 3; 
+}
 
 message GetUserByUsernameReq {
     string username = 1;
