@@ -20,6 +20,7 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationNetworkInterfaceAddFollower = "/network.interface.v1.NetworkInterface/AddFollower"
+const OperationNetworkInterfaceConfirmFriendship = "/network.interface.v1.NetworkInterface/ConfirmFriendship"
 const OperationNetworkInterfaceGetUser = "/network.interface.v1.NetworkInterface/GetUser"
 const OperationNetworkInterfaceLogin = "/network.interface.v1.NetworkInterface/Login"
 const OperationNetworkInterfaceLogout = "/network.interface.v1.NetworkInterface/Logout"
@@ -27,6 +28,7 @@ const OperationNetworkInterfaceRegister = "/network.interface.v1.NetworkInterfac
 
 type NetworkInterfaceHTTPServer interface {
 	AddFollower(context.Context, *AddFollowerReq) (*AddFollowerReply, error)
+	ConfirmFriendship(context.Context, *ConfirmFriendshipReq) (*ConfirmFriendshipReply, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserReply, error)
 	Login(context.Context, *LoginReq) (*LoginReply, error)
 	Logout(context.Context, *LogoutReq) (*LogoutReply, error)
@@ -40,6 +42,7 @@ func RegisterNetworkInterfaceHTTPServer(s *http.Server, srv NetworkInterfaceHTTP
 	r.POST("/v1/logout", _NetworkInterface_Logout0_HTTP_Handler(srv))
 	r.GET("/v1/users/{id}", _NetworkInterface_GetUser0_HTTP_Handler(srv))
 	r.POST("/v1/users/{id}/follow", _NetworkInterface_AddFollower0_HTTP_Handler(srv))
+	r.POST("/v1/users/{id}/follow/confirm", _NetworkInterface_ConfirmFriendship0_HTTP_Handler(srv))
 }
 
 func _NetworkInterface_Register0_HTTP_Handler(srv NetworkInterfaceHTTPServer) func(ctx http.Context) error {
@@ -143,8 +146,31 @@ func _NetworkInterface_AddFollower0_HTTP_Handler(srv NetworkInterfaceHTTPServer)
 	}
 }
 
+func _NetworkInterface_ConfirmFriendship0_HTTP_Handler(srv NetworkInterfaceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ConfirmFriendshipReq
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationNetworkInterfaceConfirmFriendship)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ConfirmFriendship(ctx, req.(*ConfirmFriendshipReq))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ConfirmFriendshipReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type NetworkInterfaceHTTPClient interface {
 	AddFollower(ctx context.Context, req *AddFollowerReq, opts ...http.CallOption) (rsp *AddFollowerReply, err error)
+	ConfirmFriendship(ctx context.Context, req *ConfirmFriendshipReq, opts ...http.CallOption) (rsp *ConfirmFriendshipReply, err error)
 	GetUser(ctx context.Context, req *GetUserRequest, opts ...http.CallOption) (rsp *GetUserReply, err error)
 	Login(ctx context.Context, req *LoginReq, opts ...http.CallOption) (rsp *LoginReply, err error)
 	Logout(ctx context.Context, req *LogoutReq, opts ...http.CallOption) (rsp *LogoutReply, err error)
@@ -164,6 +190,19 @@ func (c *NetworkInterfaceHTTPClientImpl) AddFollower(ctx context.Context, in *Ad
 	pattern := "/v1/users/{id}/follow"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationNetworkInterfaceAddFollower))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *NetworkInterfaceHTTPClientImpl) ConfirmFriendship(ctx context.Context, in *ConfirmFriendshipReq, opts ...http.CallOption) (*ConfirmFriendshipReply, error) {
+	var out ConfirmFriendshipReply
+	pattern := "/v1/users/{id}/follow/confirm"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationNetworkInterfaceConfirmFriendship))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

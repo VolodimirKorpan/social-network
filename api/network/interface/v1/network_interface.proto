@@ -42,6 +42,13 @@ service NetworkInterface {
         };
     }
 
+    rpc ConfirmFriendship(ConfirmFriendshipReq) returns (ConfirmFriendshipReply) {
+        option (google.api.http) = {
+            post: "/v1/users/{id}/follow/confirm"
+            body: "*"
+        };
+    }
+
     
 }
 
@@ -101,5 +108,14 @@ message AddFollowerReq {
 }
 
 message AddFollowerReply {
+    string message = 1;
+}
+
+message ConfirmFriendshipReq {
+    string id = 1;
+    string requester_id = 2;
+}
+
+message ConfirmFriendshipReply {
     string message = 1;
 }

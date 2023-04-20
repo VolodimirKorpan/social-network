@@ -56,3 +56,13 @@ func (s *NetworkInterface) AddFollower(ctx context.Context, req *v1.AddFollowerR
 		Message: msg,
 	}, nil
 }
+
+func (s *NetworkInterface) ConfirmFriendship(ctx context.Context, req *v1.ConfirmFriendshipReq) (*v1.ConfirmFriendshipReply, error) {
+	msg, err := s.uc.ConfirmFriendship(ctx, req.Id, req.RequesterId)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.ConfirmFriendshipReply{
+		Message: msg,
+	}, nil
+}

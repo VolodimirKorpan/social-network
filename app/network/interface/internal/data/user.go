@@ -130,3 +130,21 @@ func (rp *userRepo) AddFollow(ctx context.Context, u *models.User, followerID st
 	}
 	return result.(string), nil
 }
+
+func (rp *userRepo) ConfirmFriendship(ctx context.Context, id, requesterID string) (string, error) {
+	result, err, _ := rp.sg.Do(fmt.Sprintf("confirm_friendship_%s_%s", id, requesterID), func() (interface{}, error) {
+		msg, err := rp.data.uc.ConfirmFriendship(ctx, &usV1.ConfirmFriendshipReq{
+			RequesteeId:         id,
+			RequesterId: requesterID,
+		})
+		if err != nil {
+			return nil, err
+		}
+		rp.log.Debug(msg)
+		return msg.Message, nil
+	})
+	if err != nil {
+		return "", err
+	}
+	return result.(string), nil
+}

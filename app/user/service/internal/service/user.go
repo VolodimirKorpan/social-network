@@ -72,3 +72,14 @@ func (s *UserService) AddFollower(ctx context.Context, in *v1.AddFollowerReq) (*
 		Message: msg,
 	}, nil
 }
+
+
+func (s *UserService) ConfirmFriendship(ctx context.Context, in *v1.ConfirmFriendshipReq) (*v1.ConfirmFriendshipReply, error) {
+	msg, err := s.uc.ConfirmFriendship(ctx, in.RequesterId, in.RequesteeId)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.ConfirmFriendshipReply{
+		Message: msg,
+	}, nil
+}

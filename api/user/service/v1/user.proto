@@ -26,6 +26,10 @@ service UserService {
 
     rpc AddFollower(AddFollowerReq) returns (AddFollowerReply) {
     }
+
+    rpc ConfirmFriendship(ConfirmFriendshipReq) returns (ConfirmFriendshipReply) {
+        
+    }
 }
 
 message GetUserReq {
@@ -106,5 +110,14 @@ message AddFollowerReq {
 }
 
 message AddFollowerReply {
+    string message = 1;
+}
+
+message ConfirmFriendshipReq {
+    string requester_id = 1;
+    string requestee_id = 2;
+}
+
+message ConfirmFriendshipReply {
     string message = 1;
 }

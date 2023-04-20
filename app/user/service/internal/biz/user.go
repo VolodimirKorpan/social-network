@@ -30,10 +30,13 @@ type UserRepo interface {
 	GetUser(ctx context.Context, id string) (*models.User, error)
 	VerifyPassword(ctx context.Context, u *models.User) (bool, error)
 	FindByUsername(ctx context.Context, username string) (*models.User, error)
-	UpdateUser(ctx context.Context, u *models.User) error
 	AddFriend(ctx context.Context, userID, friendID string) error
-	// RemoveFollower(ctx context.Context, u *models.User, followerID string) error
-	//IsFollower(ctx context.Context, userID, followerID string) (bool, error)
+	ConfirmFriendship(ctx context.Context, requesterID, requesteeID string) error
+	RejectFriendship(ctx context.Context, requesterID, requesteeID string) error
+	GetFriendsByID(ctx context.Context, userID string) ([]*models.User, error)
+	RemoveFriend(ctx context.Context, userID, friendID string) error
+	UpdateUser(ctx context.Context, id string, updates map[string]interface{}) (*models.User, error)
+	DeleteUser(ctx context.Context, id string) error
 }
 
 type UserUseCase struct {
@@ -96,6 +99,36 @@ func (uc *UserUseCase) VerifyPassword(ctx context.Context, u *models.User) (bool
 func (uc *UserUseCase) AddFollower(ctx context.Context, user *models.User, followerID string) (string, error) {
 	err := uc.repo.AddFriend(ctx, user.ID, followerID)
 	if err != nil {
+		return "", err
+	}
+	return "success", nil
+}
+
+/*
+UpdateUser updates a user with the given id and returns a user object with the updated fields.
+
+Parameters:
+- ctx (context.Context): The context of the request.
+- userID (string): The id of the user to update.
+- updates (map[string]interface{}): The fields to update and their new values.
+
+Returns:
+- (*models.User, error): A user object with the updated fields, or an error if the user cannot be updated.
+*/
+func (uc *UserUseCase) UpdateUser(ctx context.Context, userID string, updates map[string]interface{}) (*models.User, error) {
+	user, err := uc.repo.UpdateUser(ctx, userID, updates)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (uc *UserUseCase) DeleteUser(ctx context.Context, id string) error {
+	return uc.repo.DeleteUser(ctx, id)
+}
+
+func (uc *UserUseCase) ConfirmFriendship(ctx context.Context, requesterID, requesteeID string) (string, error) {
+	if err := uc.repo.ConfirmFriendship(ctx, requesterID, requesteeID); err != nil {
 		return "", err
 	}
 	return "success", nil

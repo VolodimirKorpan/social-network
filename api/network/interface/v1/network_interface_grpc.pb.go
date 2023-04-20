@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	NetworkInterface_Register_FullMethodName    = "/network.interface.v1.NetworkInterface/Register"
-	NetworkInterface_Login_FullMethodName       = "/network.interface.v1.NetworkInterface/Login"
-	NetworkInterface_Logout_FullMethodName      = "/network.interface.v1.NetworkInterface/Logout"
-	NetworkInterface_GetUser_FullMethodName     = "/network.interface.v1.NetworkInterface/GetUser"
-	NetworkInterface_AddFollower_FullMethodName = "/network.interface.v1.NetworkInterface/AddFollower"
+	NetworkInterface_Register_FullMethodName          = "/network.interface.v1.NetworkInterface/Register"
+	NetworkInterface_Login_FullMethodName             = "/network.interface.v1.NetworkInterface/Login"
+	NetworkInterface_Logout_FullMethodName            = "/network.interface.v1.NetworkInterface/Logout"
+	NetworkInterface_GetUser_FullMethodName           = "/network.interface.v1.NetworkInterface/GetUser"
+	NetworkInterface_AddFollower_FullMethodName       = "/network.interface.v1.NetworkInterface/AddFollower"
+	NetworkInterface_ConfirmFriendship_FullMethodName = "/network.interface.v1.NetworkInterface/ConfirmFriendship"
 )
 
 // NetworkInterfaceClient is the client API for NetworkInterface service.
@@ -35,6 +36,7 @@ type NetworkInterfaceClient interface {
 	Logout(ctx context.Context, in *LogoutReq, opts ...grpc.CallOption) (*LogoutReply, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserReply, error)
 	AddFollower(ctx context.Context, in *AddFollowerReq, opts ...grpc.CallOption) (*AddFollowerReply, error)
+	ConfirmFriendship(ctx context.Context, in *ConfirmFriendshipReq, opts ...grpc.CallOption) (*ConfirmFriendshipReply, error)
 }
 
 type networkInterfaceClient struct {
@@ -90,6 +92,15 @@ func (c *networkInterfaceClient) AddFollower(ctx context.Context, in *AddFollowe
 	return out, nil
 }
 
+func (c *networkInterfaceClient) ConfirmFriendship(ctx context.Context, in *ConfirmFriendshipReq, opts ...grpc.CallOption) (*ConfirmFriendshipReply, error) {
+	out := new(ConfirmFriendshipReply)
+	err := c.cc.Invoke(ctx, NetworkInterface_ConfirmFriendship_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NetworkInterfaceServer is the server API for NetworkInterface service.
 // All implementations must embed UnimplementedNetworkInterfaceServer
 // for forward compatibility
@@ -99,6 +110,7 @@ type NetworkInterfaceServer interface {
 	Logout(context.Context, *LogoutReq) (*LogoutReply, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserReply, error)
 	AddFollower(context.Context, *AddFollowerReq) (*AddFollowerReply, error)
+	ConfirmFriendship(context.Context, *ConfirmFriendshipReq) (*ConfirmFriendshipReply, error)
 	mustEmbedUnimplementedNetworkInterfaceServer()
 }
 
@@ -120,6 +132,9 @@ func (UnimplementedNetworkInterfaceServer) GetUser(context.Context, *GetUserRequ
 }
 func (UnimplementedNetworkInterfaceServer) AddFollower(context.Context, *AddFollowerReq) (*AddFollowerReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddFollower not implemented")
+}
+func (UnimplementedNetworkInterfaceServer) ConfirmFriendship(context.Context, *ConfirmFriendshipReq) (*ConfirmFriendshipReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfirmFriendship not implemented")
 }
 func (UnimplementedNetworkInterfaceServer) mustEmbedUnimplementedNetworkInterfaceServer() {}
 
@@ -224,6 +239,24 @@ func _NetworkInterface_AddFollower_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NetworkInterface_ConfirmFriendship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfirmFriendshipReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkInterfaceServer).ConfirmFriendship(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NetworkInterface_ConfirmFriendship_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkInterfaceServer).ConfirmFriendship(ctx, req.(*ConfirmFriendshipReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NetworkInterface_ServiceDesc is the grpc.ServiceDesc for NetworkInterface service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -250,6 +283,10 @@ var NetworkInterface_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddFollower",
 			Handler:    _NetworkInterface_AddFollower_Handler,
+		},
+		{
+			MethodName: "ConfirmFriendship",
+			Handler:    _NetworkInterface_ConfirmFriendship_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

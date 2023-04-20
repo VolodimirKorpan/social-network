@@ -132,6 +132,36 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /v1/users/{id}/follow/confirm:
+        post:
+            tags:
+                - NetworkInterface
+            operationId: NetworkInterface_ConfirmFriendship
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ConfirmFriendshipReq'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ConfirmFriendshipReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
 components:
     schemas:
         AddFollowerReply:
@@ -145,6 +175,18 @@ components:
                 id:
                     type: string
                 followerId:
+                    type: string
+        ConfirmFriendshipReply:
+            type: object
+            properties:
+                message:
+                    type: string
+        ConfirmFriendshipReq:
+            type: object
+            properties:
+                id:
+                    type: string
+                requesterId:
                     type: string
         Friendship:
             type: object

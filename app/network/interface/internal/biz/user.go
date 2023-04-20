@@ -36,9 +36,9 @@ type UserRepo interface {
 	Find(ctx context.Context, id string) (*models.User, error)
 	FindByUsername(ctx context.Context, username string) (*models.User, error)
 	Save(ctx context.Context, u *models.User) (string, error)
-
 	VerifyPassword(ctx context.Context, u *models.User, password string) error
 	AddFollow(ctx context.Context, u *models.User, followerID string) (string, error)
+	ConfirmFriendship(ctx context.Context, id, requesterID string) (string, error)
 }
 
 type UserUseCase struct {
@@ -66,4 +66,8 @@ func (uc *UserUseCase) GetUser(ctx context.Context, id string) (*models.User, er
 
 func (uc *UserUseCase) AddFollow(ctx context.Context, u *models.User, followerID string) (string, error) {
 	return uc.repo.AddFollow(ctx, u, followerID)
+}
+
+func (uc *UserUseCase) ConfirmFriendship(ctx context.Context, id, requesterID string) (string, error) {
+	return uc.repo.ConfirmFriendship(ctx, id, requesterID)
 }

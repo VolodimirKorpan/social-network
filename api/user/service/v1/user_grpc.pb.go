@@ -26,6 +26,7 @@ const (
 	UserService_ListUser_FullMethodName          = "/api.user.service.v1.UserService/ListUser"
 	UserService_VerifyPassword_FullMethodName    = "/api.user.service.v1.UserService/VerifyPassword"
 	UserService_AddFollower_FullMethodName       = "/api.user.service.v1.UserService/AddFollower"
+	UserService_ConfirmFriendship_FullMethodName = "/api.user.service.v1.UserService/ConfirmFriendship"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -39,6 +40,7 @@ type UserServiceClient interface {
 	ListUser(ctx context.Context, in *ListUserReq, opts ...grpc.CallOption) (*ListUserReply, error)
 	VerifyPassword(ctx context.Context, in *VerifyPasswordReq, opts ...grpc.CallOption) (*VerifyPasswordReply, error)
 	AddFollower(ctx context.Context, in *AddFollowerReq, opts ...grpc.CallOption) (*AddFollowerReply, error)
+	ConfirmFriendship(ctx context.Context, in *ConfirmFriendshipReq, opts ...grpc.CallOption) (*ConfirmFriendshipReply, error)
 }
 
 type userServiceClient struct {
@@ -112,6 +114,15 @@ func (c *userServiceClient) AddFollower(ctx context.Context, in *AddFollowerReq,
 	return out, nil
 }
 
+func (c *userServiceClient) ConfirmFriendship(ctx context.Context, in *ConfirmFriendshipReq, opts ...grpc.CallOption) (*ConfirmFriendshipReply, error) {
+	out := new(ConfirmFriendshipReply)
+	err := c.cc.Invoke(ctx, UserService_ConfirmFriendship_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -123,6 +134,7 @@ type UserServiceServer interface {
 	ListUser(context.Context, *ListUserReq) (*ListUserReply, error)
 	VerifyPassword(context.Context, *VerifyPasswordReq) (*VerifyPasswordReply, error)
 	AddFollower(context.Context, *AddFollowerReq) (*AddFollowerReply, error)
+	ConfirmFriendship(context.Context, *ConfirmFriendshipReq) (*ConfirmFriendshipReply, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -150,6 +162,9 @@ func (UnimplementedUserServiceServer) VerifyPassword(context.Context, *VerifyPas
 }
 func (UnimplementedUserServiceServer) AddFollower(context.Context, *AddFollowerReq) (*AddFollowerReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddFollower not implemented")
+}
+func (UnimplementedUserServiceServer) ConfirmFriendship(context.Context, *ConfirmFriendshipReq) (*ConfirmFriendshipReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfirmFriendship not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -290,6 +305,24 @@ func _UserService_AddFollower_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_ConfirmFriendship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfirmFriendshipReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).ConfirmFriendship(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_ConfirmFriendship_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).ConfirmFriendship(ctx, req.(*ConfirmFriendshipReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -324,6 +357,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddFollower",
 			Handler:    _UserService_AddFollower_Handler,
+		},
+		{
+			MethodName: "ConfirmFriendship",
+			Handler:    _UserService_ConfirmFriendship_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
